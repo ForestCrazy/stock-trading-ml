@@ -73,7 +73,7 @@ def crypto_data(symbol, start_year, end_year):
                             print("Connection refused by the server..")
                             print("Let me sleep for 5 seconds")
                             print("ZZzzzz...")
-                            time.sleep(2)
+                            time.sleep(5)
                             print("Was a nice sleep, now let me continue...")
                             continue
         toaster.show_toast("Crypto Price Predicted Project", f"success load kline data of year {year}.", icon_path=None, duration=10)
