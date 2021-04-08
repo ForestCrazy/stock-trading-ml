@@ -45,7 +45,7 @@ def crypto_data(symbol, start_year, end_year):
     toaster = ToastNotifier()
     data_list = []
 
-    for year in range(start_year, end_year):
+    for year in range(start_year, end_year+1):
         for month in range(1, 12+1):
             toaster.show_toast("Crypto Price Predicted Project", f"start load kline data at {month}/{year}.", icon_path=None, duration=10)
             _, num_days = calendar.monthrange(year, month)
