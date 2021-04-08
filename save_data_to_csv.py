@@ -91,18 +91,19 @@ def crypto_data(symbol, start_year, end_year):
         toaster.show_toast("Crypto Price Predicted Project", f"success load kline data of year {year}.", icon_path=None, duration=10)
     toaster.show_toast("Crypto Price Predicted Project", f"success load all kline data from year {start_year} to {end_year}.", icon_path=None, duration=10)
 
-    ## init csv file
-    a = numpy.array([['date','1. open','2. high','3. low','4. close','5. volume']])
-    with open(symbol + '.csv', 'a', newline='') as file:
-        mywriter = csv.writer(file, delimiter=',')
-        mywriter.writerows(a)
-
-    for data in data_list:
-        a = numpy.array([data])
-
+    if data_list:
+        ## init csv file
+        a = numpy.array([['date','1. open','2. high','3. low','4. close','5. volume']])
         with open(symbol + '.csv', 'a', newline='') as file:
             mywriter = csv.writer(file, delimiter=',')
             mywriter.writerows(a)
+
+        for data in data_list:
+            a = numpy.array([data])
+
+            with open(symbol + '.csv', 'a', newline='') as file:
+                mywriter = csv.writer(file, delimiter=',')
+                mywriter.writerows(a)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
