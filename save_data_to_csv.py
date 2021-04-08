@@ -81,7 +81,7 @@ def crypto_data(symbol, start_year, end_year):
                             if not response.json():
                                 null_data += 1
                                 if time_null_data == None:
-                                    time_null_data = '{day}/{month}/{year}'
+                                    time_null_data = f'{day}/{month}/{year}'
                             break
                         except:
                             print("Connection refused by the server..")
