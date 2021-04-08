@@ -2,7 +2,7 @@ import pandas as pd
 from sklearn import preprocessing
 import numpy as np
 
-history_points = 50
+history_points = 4320
 
 
 def csv_to_dataset(csv_path):

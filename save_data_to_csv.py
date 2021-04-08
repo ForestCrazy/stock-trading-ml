@@ -17,6 +17,7 @@ def save_dataset(symbol, time_window):
     api_key = '5KDAR88AAANK32GX'
     print(symbol, time_window)
     ts = TimeSeries(key=api_key, output_format='pandas')
+
     if time_window == 'intraday':
         data, meta_data = ts.get_intraday(
             symbol='MSFT', interval='1min', outputsize='full')
@@ -41,57 +42,90 @@ if __name__ == "__main__":
     save_dataset(**vars(namespace))
 """
 
-def crypto_data(symbol, start_year, end_year):
+def crypto_data(symbol, interval, start_time_input, stop_time_input):
     toaster = ToastNotifier()
     data_list = []
     null_data = 0
     time_null_data = None
 
-    for year in range(start_year, end_year+1):
-        if null_data > 300:
+    def check_interval_level(interval):
+        switcher = {
+            '1m' : 60,
+            '3m' : 120,
+            '5m' : 300,
+            '15m' : 900,
+            '30m' : 1800,
+            '1h' : 3600,
+            '2h' : 7200,
+            '4h' : 14400,
+            '6h' : 21600,
+            '8h' : 28800,
+            '12h' : 43200,
+            '1d' : 86400,
+            '3d' : 259200,
+            '1w' : 604800,
+            '1M' : 2592000
+        }
+
+        return switcher.get(interval, 4)
+    
+    def check_interval_kline(loop, interval):
+        loop_level = check_interval_level(loop)
+        interval_level = check_interval_level(interval)
+        
+        if interval_level >= loop_level:
+            return True
+        else:
+            return False
+
+    def request_kline_data(start_time, end_time):
+        print('happy')
+
+    end_time = int(time.mktime(datetime.datetime.now().timetuple()))
+    start_time = end_time
+    # end_time = int(time.mktime(datetime.strptime(start_time_input, f'%d/%m/%y {"%H" if check_interval_level(interval) <= 43200}{":%M" if check_interval_level(interval) <= 3600 else ""}')))
+    while True:
+        time_jump_step = check_interval_level(interval, )
+        if end_time >= stop_time_input:
             break
-        for month in range(1, 12+1):
-            if null_data > 300:
+        if null_data > 2:
+            toaster.show_toast("Crypto Price Predicted Project", f"kline data after {time_null_data} is missing.", icon_path=None, duration=10)
+            break
+        for t in range(1, 1000+1):
+            end_time += time_jump_step
+            if end_time >= stop_time_input:
                 break
-            toaster.show_toast("Crypto Price Predicted Project", f"start load kline data at {month}/{year}.", icon_path=None, duration=10)
-            _, num_days = calendar.monthrange(year, month)
-            for day in range(1, num_days+1):
-                if null_data > 300:
-                    break
-                for hour in range(1, 23):
-                    if null_data > 300:
-                        toaster.show_toast("Crypto Price Predicted Project", f"kline data after {time_null_data} is missing.", icon_path=None, duration=10)
-                        break
-                    start_time = int(time.mktime(datetime.datetime(year, month, day, hour, 0+1, 0).timetuple())) * 1000
-                    end_time = int(time.mktime(datetime.datetime(year, month, day, hour+1, 0, 0).timetuple())) * 1000
-                    url = "https://api2.binance.com/api/v3/klines?symbol=" + symbol + "&interval=1m&limit=1000&startTime=" + str(start_time) + "&endTime=" + str(end_time)
-                    response = ''
-                    while response == '':
-                        try:
-                            response = requests.get(url, headers={'Cache-Control': 'no-cache'})
-                            for i in response.json():
-                                print(datetime.datetime.fromtimestamp(int(i[0]) / 1000).strftime('%Y-%m-%d %H:%M:%S'))
-                                print('Open : ', i[1])
-                                print('Close : ', i[4])
-                                print('High : ', i[2])
-                                print('Low : ', i[3])
-                                print('Volume : ', i[5])
-                                print('\n')
-                                data_list.insert(0, [datetime.datetime.fromtimestamp(int(i[0]) / 1000).strftime('%Y-%m-%d %H:%M:%S'), i[1], i[4], i[2], i[3], i[5]])
-                            if not response.json():
-                                null_data += 1
-                                if time_null_data == None:
-                                    time_null_data = f'{day}/{month}/{year}'
-                            break
-                        except:
-                            print("Connection refused by the server..")
-                            print("Let me sleep for 5 seconds")
-                            print("ZZzzzz...")
-                            time.sleep(5)
-                            print("Was a nice sleep, now let me continue...")
-                            continue
-        toaster.show_toast("Crypto Price Predicted Project", f"success load kline data of year {year}.", icon_path=None, duration=10)
-    toaster.show_toast("Crypto Price Predicted Project", f"success load all kline data from year {start_year} to {end_year}.", icon_path=None, duration=10)
+
+        print(datetime.datetime.fromtimestamp(int(start_time)).strftime('%Y-%m-%d %H:%M:%S'), start_time)
+        print(datetime.datetime.fromtimestamp(int(end_time)).strftime('%Y-%m-%d %H:%M:%S'), end_time)
+        url = "https://api2.binance.com/api/v3/klines?symbol=" + symbol + "&interval=" + interval + "&limit=1000&startTime=" + str(start_time * 1000) + "&endTime=" + str(end_time * 1000)
+        response = ''
+        while response == '':
+            try:
+                response = requests.get(url, headers={'Cache-Control': 'no-cache'})
+                for i in response.json():
+                    print(datetime.datetime.fromtimestamp(int(i[0]) / 1000).strftime('%Y-%m-%d %H:%M:%S'))
+                    print('Open : ', i[1])
+                    print('Close : ', i[4])
+                    print('High : ', i[2])
+                    print('Low : ', i[3])
+                    print('Volume : ', i[5])
+                    print('\n')
+                    data_list.insert(0, [datetime.datetime.fromtimestamp(int(i[0]) / 1000).strftime('%Y-%m-%d %H:%M:%S'), i[1], i[4], i[2], i[3], i[5]])
+                if not response.json():
+                    null_data += 1
+                    if time_null_data == None:
+                        time_null_data = datetime.datetime.fromtimestamp(int(end_time)).strftime('%Y-%m-%d %H:%M:%S')
+                break
+            except:
+                print("Connection refused by the server..")
+                print("Let me sleep for 5 seconds")
+                print("ZZzzzz...")
+                time.sleep(5)
+                print("Was a nice sleep, now let me continue...")
+                continue
+        start_time = end_time + time_jump_step
+    toaster.show_toast("Crypto Price Predicted Project", f"success load all kline data from {start_time} to {end_time}.", icon_path=None, duration=10)
 
     if data_list:
         ## init csv file
@@ -111,8 +145,8 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
 
     parser.add_argument('symbol', type=str, help="the stock symbol you want to download")
-    parser.add_argument('start_year', type=int, help="the start year kline data you want to download")
-    parser.add_argument('end_year', type=int, help="the end year kline data you want to download")
+    parser.add_argument('start_time', type=int, help="the start year kline data you want to download")
+    parser.add_argument('end_time', type=int, help="the end year kline data you want to download")
 
     namespace = parser.parse_args()
     crypto_data(**vars(namespace))
