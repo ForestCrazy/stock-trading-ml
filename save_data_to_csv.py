@@ -45,6 +45,7 @@ def crypto_data(symbol, start_year, end_year):
     toaster = ToastNotifier()
     data_list = []
     null_data = 0
+    time_null_data = None
 
     for year in range(start_year, end_year+1):
         if null_data > 300:
@@ -59,12 +60,11 @@ def crypto_data(symbol, start_year, end_year):
                     break
                 for hour in range(1, 23):
                     if null_data > 300:
-                        toaster.show_toast("Crypto Price Predicted Project", f"kline data after {day}/{month}/{year} is empty.", icon_path=None, duration=10)
+                        toaster.show_toast("Crypto Price Predicted Project", f"kline data after {time_null_data} is missing.", icon_path=None, duration=10)
                         break
                     start_time = int(time.mktime(datetime.datetime(year, month, day, hour, 0+1, 0).timetuple())) * 1000
                     end_time = int(time.mktime(datetime.datetime(year, month, day, hour+1, 0, 0).timetuple())) * 1000
                     url = "https://api2.binance.com/api/v3/klines?symbol=" + symbol + "&interval=1m&limit=1000&startTime=" + str(start_time) + "&endTime=" + str(end_time)
-                    # print(url)
                     response = ''
                     while response == '':
                         try:
@@ -80,6 +80,8 @@ def crypto_data(symbol, start_year, end_year):
                                 data_list.insert(0, [datetime.datetime.fromtimestamp(int(i[0]) / 1000).strftime('%Y-%m-%d %H:%M:%S'), i[1], i[4], i[2], i[3], i[5]])
                             if not response.json():
                                 null_data += 1
+                                if time_null_data == None:
+                                    time_null_data = '{day}/{month}/{year}'
                             break
                         except:
                             print("Connection refused by the server..")
