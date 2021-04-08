@@ -68,32 +68,24 @@ def crypto_data(symbol, interval, start_time_input, stop_time_input):
         }
 
         return switcher.get(interval, 4)
-    
-    def check_interval_kline(loop, interval):
-        loop_level = check_interval_level(loop)
-        interval_level = check_interval_level(interval)
-        
-        if interval_level >= loop_level:
-            return True
-        else:
-            return False
 
     def request_kline_data(start_time, end_time):
         print('happy')
 
-    end_time = int(time.mktime(datetime.datetime.now().timetuple()))
+    end_time = int(time.mktime(datetime.datetime.strptime(start_time_input, '%d-%m-%y %H:%M:%S').timetuple()))
+    stop_time = int(time.mktime(datetime.datetime.strptime(stop_time_input, '%d-%m-%y %H:%M:%S').timetuple()))
     start_time = end_time
     # end_time = int(time.mktime(datetime.strptime(start_time_input, f'%d/%m/%y {"%H" if check_interval_level(interval) <= 43200}{":%M" if check_interval_level(interval) <= 3600 else ""}')))
     while True:
         time_jump_step = check_interval_level(interval, )
-        if end_time >= stop_time_input:
+        if end_time >= stop_time:
             break
         if null_data > 2:
             toaster.show_toast("Crypto Price Predicted Project", f"kline data after {time_null_data} is missing.", icon_path=None, duration=10)
             break
         for t in range(1, 1000+1):
             end_time += time_jump_step
-            if end_time >= stop_time_input:
+            if end_time >= stop_time:
                 break
 
         print(datetime.datetime.fromtimestamp(int(start_time)).strftime('%Y-%m-%d %H:%M:%S'), start_time)
@@ -125,7 +117,7 @@ def crypto_data(symbol, interval, start_time_input, stop_time_input):
                 print("Was a nice sleep, now let me continue...")
                 continue
         start_time = end_time + time_jump_step
-    toaster.show_toast("Crypto Price Predicted Project", f"success load all kline data from {start_time} to {end_time}.", icon_path=None, duration=10)
+    toaster.show_toast("Crypto Price Predicted Project", f"success load all kline data from {datetime.datetime.strptime(start_time_input, '%d-%m-%y %H:%M:%S')} to {datetime.datetime.strptime(stop_time_input, '%d-%m-%y %H:%M:%S')}.", icon_path=None, duration=10)
 
     if data_list:
         ## init csv file
@@ -145,8 +137,9 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
 
     parser.add_argument('symbol', type=str, help="the stock symbol you want to download")
-    parser.add_argument('start_time', type=int, help="the start year kline data you want to download")
-    parser.add_argument('end_time', type=int, help="the end year kline data you want to download")
+    parser.add_argument('interval', type=str, choices=['1m', '3m', '5m', '15m', '30m', '1h', '2h', '4h', '6h', '8h', '12h', '1d', '3d', '1w', '1M'], help="the stock symbol you want to download")
+    parser.add_argument('start_time_input', type=str, help="the start year kline data you want to download")
+    parser.add_argument('stop_time_input', type=str, help="the end year kline data you want to download")
 
     namespace = parser.parse_args()
     crypto_data(**vars(namespace))

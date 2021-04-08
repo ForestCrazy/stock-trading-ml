@@ -3,9 +3,9 @@ import time
 
 # print(datetime.datetime.strptime("01022020", f'%d/%m/%y {"%H" if False else ""}{":%M" if False else ""}'))
 
-date_time_str = '18/09/19 01:55'
+date_time_str = '18-09-19 01:55:00'
 
-date_time_obj = datetime.datetime.strptime(date_time_str, f'%d/%m/%y {"%H" if False else ""}{":%M" if False else ""}')
+date_time_obj = datetime.datetime.strptime(date_time_str, '%d-%m-%y %H:%M:%S')
 
 
 print("The type of the date is now",  type(date_time_obj))
