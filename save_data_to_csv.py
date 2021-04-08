@@ -59,6 +59,7 @@ def crypto_data(symbol, start_year, end_year):
                     break
                 for hour in range(1, 23):
                     if null_data > 300:
+                        toaster.show_toast("Crypto Price Predicted Project", f"kline data after {day}/{month}/{year} is empty.", icon_path=None, duration=10)
                         break
                     start_time = int(time.mktime(datetime.datetime(year, month, day, hour, 0+1, 0).timetuple())) * 1000
                     end_time = int(time.mktime(datetime.datetime(year, month, day, hour+1, 0, 0).timetuple())) * 1000
@@ -88,6 +89,7 @@ def crypto_data(symbol, start_year, end_year):
                             print("Was a nice sleep, now let me continue...")
                             continue
         toaster.show_toast("Crypto Price Predicted Project", f"success load kline data of year {year}.", icon_path=None, duration=10)
+    toaster.show_toast("Crypto Price Predicted Project", f"success load all kline data from year {start_year} to {end_year}.", icon_path=None, duration=10)
 
     ## init csv file
     a = numpy.array([['date','1. open','2. high','3. low','4. close','5. volume']])
