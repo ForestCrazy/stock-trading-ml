@@ -1,46 +1,12 @@
 import requests
 import datetime
-import calendar
 import time
 import csv
 import numpy
 
 from win10toast import ToastNotifier
 
-from alpha_vantage.timeseries import TimeSeries
-from pprint import pprint
-import json
 import argparse
-
-"""
-def save_dataset(symbol, time_window):
-    api_key = '5KDAR88AAANK32GX'
-    print(symbol, time_window)
-    ts = TimeSeries(key=api_key, output_format='pandas')
-
-    if time_window == 'intraday':
-        data, meta_data = ts.get_intraday(
-            symbol='MSFT', interval='1min', outputsize='full')
-    elif time_window == 'daily':
-        data, meta_data = ts.get_daily(symbol, outputsize='full')
-    elif time_window == 'daily_adj':
-        data, meta_data = ts.get_daily_adjusted(symbol, outputsize='full')
-
-    pprint(data.head(10))
-
-    data.to_csv(f'./{symbol}_{time_window}.csv')
-
-
-if __name__ == "__main__":
-    parser = argparse.ArgumentParser()
-
-    parser.add_argument('symbol', type=str, help="the stock symbol you want to download")
-    parser.add_argument('time_window', type=str, choices=[
-                        'intraday', 'daily', 'daily_adj'], help="the time period you want to download the stock history for")
-
-    namespace = parser.parse_args()
-    save_dataset(**vars(namespace))
-"""
 
 def crypto_data(symbol, interval, start_time_input, stop_time_input):
     toaster = ToastNotifier()
@@ -97,13 +63,13 @@ def crypto_data(symbol, interval, start_time_input, stop_time_input):
                 response = requests.get(url, headers={'Cache-Control': 'no-cache'})
                 for i in response.json():
                     print(datetime.datetime.fromtimestamp(int(i[0]) / 1000).strftime('%Y-%m-%d %H:%M:%S'))
-                    print('Open : ', i[1])
-                    print('Close : ', i[4])
-                    print('High : ', i[2])
-                    print('Low : ', i[3])
-                    print('Volume : ', i[5])
+                    print('Open : ', i[1][:-7])
+                    print('Close : ', i[4][:-7])
+                    print('High : ', i[2][:-7])
+                    print('Low : ', i[3][:-7])
+                    print('Volume : ', i[5][:-7])
                     print('\n')
-                    data_list.insert(0, [datetime.datetime.fromtimestamp(int(i[0]) / 1000).strftime('%Y-%m-%d %H:%M:%S'), i[1], i[4], i[2], i[3], i[5]])
+                    data_list.insert(0, [datetime.datetime.fromtimestamp(int(i[0]) / 1000).strftime('%Y-%m-%d %H:%M:%S'), i[1][:-7], i[4][:-7], i[2][:-7], i[3][:-7], i[5][:-7]])
                 if not response.json():
                     null_data += 1
                     if time_null_data == None:
@@ -120,18 +86,20 @@ def crypto_data(symbol, interval, start_time_input, stop_time_input):
     toaster.show_toast("Crypto Price Predicted Project", f"success load all kline data from {datetime.datetime.strptime(start_time_input, '%d-%m-%y %H:%M:%S')} to {datetime.datetime.strptime(stop_time_input, '%d-%m-%y %H:%M:%S')}.", icon_path=None, duration=10)
 
     if data_list:
+        filename = symbol + '_' + interval + '_' + str(datetime.datetime.strptime(start_time_input, '%d-%m-%y %H:%M:%S')).replace(":", "-") + '_' + str(datetime.datetime.strptime(stop_time_input, '%d-%m-%y %H:%M:%S')).replace(":", "-") + '.csv'
         ## init csv file
         a = numpy.array([['date','1. open','2. high','3. low','4. close','5. volume']])
-        with open(symbol + '.csv', 'a', newline='') as file:
+        with open(filename, 'a', newline='') as file:
             mywriter = csv.writer(file, delimiter=',')
             mywriter.writerows(a)
 
         for data in data_list:
             a = numpy.array([data])
 
-            with open(symbol + '.csv', 'a', newline='') as file:
+            with open(filename, 'a', newline='') as file:
                 mywriter = csv.writer(file, delimiter=',')
                 mywriter.writerows(a)
+        toaster.show_toast("Crypto Price Predicted Project", f"write file {filename} success.", icon_path=None, duration=10)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()

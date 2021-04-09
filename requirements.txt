@@ -4,3 +4,4 @@ sklearn
 keras
 tensorflow
 matplotlib
+win10toast
