@@ -2,13 +2,62 @@ import pandas as pd
 from sklearn import preprocessing
 import numpy as np
 
-history_points = 4320
+from binance.client import Client
+from binance.enums import *
+
+history_points = 20
 
 
-def csv_to_dataset(csv_path):
-    data = pd.read_csv(csv_path)
-    data = data.drop('date', axis=1)
-    data = data.drop(0, axis=0)
+def csv_to_dataset(**options):
+    """
+    :param csv_path: path/to/csv/file
+    :type csv_path: str
+    :param symbol: Name of symbol pair e.g BNBBTC
+    :type symbol: str
+    :param interval: Binance Kline interval
+    :type interval: str
+    :param start_time: Start date string in UTC format or timestamp in milliseconds
+    :type start_time: str|int
+    :param end_time: optional - end date string in UTC format or timestamp in milliseconds (default will fetch everything up to now)
+    :type end_time: str|int
+    """
+    if options.get('csv_path') == None:
+        if None in {options.get('symbol'), options.get('interval'), options.get('start_time')}:
+            raise Exception("argument requires")
+        else:
+            symbol = options.get('symbol')
+            interval = options.get('interval')
+            start_time = options.get('start_time')
+            if options.get('end_time'):
+                end_time = options.get('end_time')
+            else:
+                end_time = None
+        
+        api_key = ''
+        api_secret = ''
+        client = Client(api_key, api_secret)
+
+        candles = client.get_historical_klines(symbol, interval, start_time, end_time)
+
+        data = pd.DataFrame(candles)
+        
+        data.rename(columns={1 : 'Open', 2 : 'High', 3 : 'Low', 4 : 'Close', 5 : 'Volume'}, inplace=True)
+
+        
+        data = data.drop([0, 6, 7, 8, 9, 10, 11], axis=1)
+        data = data.drop(0, axis=0)
+
+        data['Open'] = data['Open'].astype('float')
+        data['High'] = data['High'].astype('float')
+        data['Low'] = data['Low'].astype('float')
+        data['Close'] = data['Close'].astype('float')
+        data['Volume'] = data['Volume'].astype('float')
+        
+        # print(data.to_string())
+    else :
+        data = pd.read_csv(options.get('csv_path'))
+        data = data.drop('date', axis=1)
+        data = data.drop(0, axis=0)
 
     data = data.values
 

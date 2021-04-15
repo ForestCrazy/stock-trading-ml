@@ -8,10 +8,12 @@ import tensorflow as tf
 tf.random.set_seed(4)
 from util import csv_to_dataset, history_points
 
+from binance.client import Client
+from binance.enums import *
 
 # dataset
 
-ohlcv_histories, _, next_day_open_values, unscaled_y, y_normaliser = csv_to_dataset('BNBUSDT_1h.csv')
+ohlcv_histories, _, next_day_open_values, unscaled_y, y_normaliser = csv_to_dataset(csv_path='BNBUSDT_1d_2021-01-01 00-00-00_2021-04-15 00-00-00.csv')
 
 test_split = 0.9
 n = int(ohlcv_histories.shape[0] * test_split)
@@ -39,9 +41,9 @@ x = Dense(1, name='dense_1')(x)
 output = Activation('linear', name='linear_output')(x)
 
 model = Model(inputs=lstm_input, outputs=output)
-adam = optimizers.Adam(lr=0.0005)
+adam = optimizers.Adam(lr=0.002)
 model.compile(optimizer=adam, loss='mse')
-model.fit(x=ohlcv_train, y=y_train, batch_size=32, epochs=5000, shuffle=True, validation_split=0.1)
+model.fit(x=ohlcv_train, y=y_train, batch_size=32, epochs=1000, shuffle=True, validation_split=0.1)
 
 
 # evaluation

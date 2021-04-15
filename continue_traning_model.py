@@ -1,5 +1,6 @@
 import keras
 import tensorflow as tf
+from tensorflow import keras
 from keras.models import Model
 from keras.layers import Dense, Dropout, LSTM, Input, Activation, concatenate
 from keras import optimizers
@@ -58,7 +59,7 @@ z = Dense(1, activation="linear", name='dense_out')(z)
 
 # our model will accept the inputs of the two branches and
 # then output a single value
-model = Model(inputs=[lstm_branch.input, technical_indicators_branch.input], outputs=z)
+model = keras.models.load_model('./save_model')
 adam = optimizers.Adam(lr=0.001)
 model.compile(optimizer=adam, loss='mse')
 model.fit(x=[ohlcv_train, tech_ind_train], y=y_train, batch_size=32, epochs=10, shuffle=True, validation_split=0.1)

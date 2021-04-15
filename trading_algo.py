@@ -1,10 +1,13 @@
 import numpy as np
-from keras.models import load_model
+from tensorflow import keras
 from util import csv_to_dataset, history_points
 
-model = load_model('technical_model.h5')
+from binance.client import Client
+from binance.enums import *
 
-ohlcv_histories, technical_indicators, next_day_open_values, unscaled_y, y_normaliser = csv_to_dataset('MSFT_daily.csv')
+model = keras.models.load_model('./save_model')
+
+ohlcv_histories, technical_indicators, next_day_open_values, unscaled_y, y_normaliser = csv_to_dataset('BNBUSDT_1d_2021-01-01 00-00-00_2021-04-15 00-00-00.csv')
 
 test_split = 0.9
 n = int(ohlcv_histories.shape[0] * test_split)
@@ -34,7 +37,7 @@ for ohlcv, ind in zip(ohlcv_test[start: end], tech_ind_test[start: end]):
     normalised_price_today = ohlcv[-1][0]
     normalised_price_today = np.array([[normalised_price_today]])
     price_today = y_normaliser.inverse_transform(normalised_price_today)
-    predicted_price_tomorrow = np.squeeze(y_normaliser.inverse_transform(model.predict([[ohlcv], [ind]])))
+    predicted_price_tomorrow = np.squeeze(y_normaliser.inverse_transform(model.predict([np.array([ohlcv]), np.array([ind])])))
     delta = predicted_price_tomorrow - price_today
     if delta > thresh:
         buys.append((x, price_today[0][0]))

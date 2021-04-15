@@ -6,8 +6,7 @@ A stock trading bot that uses machine learning to make price predictions.
 
 ## Requirements
 
--   Python 3.5+
--   binance_api
+-   Python 3.8+
 -   pandas
 -   numpy
 -   sklearn
@@ -25,7 +24,7 @@ A stock trading bot that uses machine learning to make price predictions.
 
 1. Clone the repo
 2. Pip install the requirements `pip install -r requirements.txt`
-3. Save the stock price history to a csv file `python save_data_to_csv.py --help`
+3. Save the stock price history to a csv file `python save_data_to_csv.py --help` example command `python save_data_to_csv.py BNBUSDT  "01-01-21 00:00:00" "09-04-21 00:00:00"`
 4. Edit one of the model files to accept the symbol you want
 5. Edit model architecture
 6. Edit dataset preprocessing / history_points inside util.py
